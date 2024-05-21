@@ -116,4 +116,10 @@ export class CounseleeController {
   async getById(@Param('id') id: string) {
     return this.counseleeService.getById(id);
   }
+  @ApiOperation({ summary: 'get spouce details if exists by phonenumber' })
+  @ApiResponse({ type: CounseleeSchema })
+  @Get('/spouce/:phonenumber')
+  async getSpouceDetails(@Param('phonenumber') phonenumber: string) {
+    return this.counseleeService.getSpouceDetails(phonenumber);
+  }
 }

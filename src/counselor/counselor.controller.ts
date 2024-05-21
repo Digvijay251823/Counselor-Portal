@@ -60,8 +60,20 @@ export class CounselorController {
     example: 'ASC',
   })
   @Get('/')
-  async getCounselee() {
-    return this.counselorService.getCounselor();
+  async getCounselee(
+    @Query('page') page = '1',
+    @Query('limit') limit = '10',
+    @Query('sortBy') sortBy = 'createdAt',
+    @Query('sortOrder') sortOrder: 'ASC' | 'DESC' = 'ASC',
+  ) {
+    const pageNumber = parseInt(page, 10);
+    const pageSize = parseInt(limit, 10);
+    return this.counselorService.getCounselor(
+      pageNumber,
+      pageSize,
+      sortBy,
+      sortOrder,
+    );
   }
 
   @ApiResponseMessage('Counselor created successfully')

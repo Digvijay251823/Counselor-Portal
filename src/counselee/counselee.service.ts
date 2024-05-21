@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+
 import { Counselee } from 'src/Entities/Counselee.entity';
 import { Counselor } from 'src/Entities/Counselor.entity';
 import { Repository } from 'typeorm';
@@ -13,9 +14,9 @@ import { Repository } from 'typeorm';
 export class CounseleeService {
   constructor(
     @InjectRepository(Counselee)
-    private CounseleeModel: Repository<Counselee>,
+    private readonly CounseleeModel: Repository<Counselee>,
     @InjectRepository(Counselor)
-    private CounselorModel: Repository<Counselor>,
+    private readonly CounselorModel: Repository<Counselor>,
   ) {}
 
   async getCounselee(
@@ -44,22 +45,24 @@ export class CounseleeService {
 
   async createCounselee(inputData: Partial<Counselee>) {
     try {
-      const counselee = await this.CounseleeModel.findOne({
-        where: {
-          phoneNumber: inputData.phoneNumber,
-        },
+      // Check if a counselee with the same phone number already exists
+      const existingCounselee = await this.CounseleeModel.findOne({
+        where: { phoneNumber: inputData.phoneNumber },
       });
-      if (counselee) {
+      if (existingCounselee) {
         throw new HttpException(
-          'User already exist please try another details',
+          'User already exists, please try another phone number',
           HttpStatus.CONFLICT,
         );
       }
-      const newcounselee = this.CounseleeModel.create(inputData);
-      await this.CounseleeModel.save(newcounselee);
+
+      // Create the new counselee
+      const newCounselee = this.CounseleeModel.create(inputData);
+      await this.CounseleeModel.save(newCounselee);
+
       return {
-        Success: 'false',
-        content: { message: 'counselee created successfully' },
+        success: true,
+        content: { message: 'Counselee created successfully' },
       };
     } catch (error) {
       throw error;
@@ -96,6 +99,7 @@ export class CounseleeService {
         );
       }
       counselee.currentCounselor = counselor;
+      counselee.connectedToCounselorSince = new Date();
       await this.CounseleeModel.save(counselee);
       return { Success: true, message: 'updated successfully' };
     } catch (error) {
@@ -107,6 +111,7 @@ export class CounseleeService {
     try {
       const Counselee = await this.CounseleeModel.findOne({
         where: { phoneNumber: phoneNumber },
+        relations: ['husband', 'currentCounselor'],
       });
       if (!Counselee) {
         throw new NotFoundException('counselee doesnt exist');
@@ -119,11 +124,40 @@ export class CounseleeService {
 
   async getById(id: string) {
     try {
-      const counselee = await this.CounseleeModel.findOne({ where: { id } });
+      const counselee = await this.CounseleeModel.findOne({
+        where: { id },
+        relations: ['husband', 'currentCounselor'],
+      });
       if (!counselee) {
         throw new NotFoundException('counselee doesnt exist please register');
       }
       return { Success: true, Content: counselee };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getSpouceDetails(phonenumber: string) {
+    try {
+      const counseleeMale = await this.CounseleeModel.findOne({
+        where: { phoneNumber: phonenumber },
+      });
+      if (!counseleeMale) {
+        throw new NotFoundException('counselee doesnt exist');
+      }
+
+      if (counseleeMale.maritalStatus === 'UNMARRIED') {
+        return { Success: true, content: null };
+      }
+      if (counseleeMale.gender !== 'MALE') {
+        return { Success: true, content: null };
+      }
+
+      const counseleeFemale = await this.CounseleeModel.findOne({
+        where: { husband: { id: counseleeMale.id } },
+      });
+      console.log(counseleeFemale);
+      return { Success: true, content: counseleeFemale };
     } catch (error) {
       throw error;
     }

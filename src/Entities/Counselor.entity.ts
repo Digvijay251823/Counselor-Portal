@@ -6,14 +6,12 @@ import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
-  ManyToOne,
   OneToOne,
   JoinColumn,
   UpdateDateColumn,
   CreateDateColumn, // Import the necessary decorators
 } from 'typeorm';
 import { NextFunction } from 'express';
-import { Child } from './Children.entity';
 
 const JWT_SECRET = process.env.JWT_TOKEN;
 
@@ -22,10 +20,10 @@ export class Counselor {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ nullable: true })
   firstName: string;
 
-  @Column()
+  @Column({ nullable: true })
   lastName: string;
 
   @Column({ nullable: true })
@@ -37,7 +35,7 @@ export class Counselor {
   @Column()
   gender: string;
 
-  @Column()
+  @Column({ nullable: true })
   age: number;
 
   @Column({ nullable: true })
@@ -50,11 +48,11 @@ export class Counselor {
   maritalStatus: string;
 
   // Define the relationship with another Counselor entity
-  @OneToOne(() => Counselor, { nullable: true })
+  @OneToOne(() => Counselor, { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn()
   husband: Counselor;
 
-  @Column()
+  @Column({ nullable: true })
   address: string;
 
   @Column({ nullable: true })
@@ -74,8 +72,8 @@ export class Counselor {
 
   @Column({ nullable: true })
   harinamInitiationPlace: string;
-  @ManyToOne(() => Child, { nullable: true })
-  children: Child[];
+  @Column({ type: 'jsonb', nullable: true })
+  children: JSON;
 
   @CreateDateColumn()
   createdAt: Date;

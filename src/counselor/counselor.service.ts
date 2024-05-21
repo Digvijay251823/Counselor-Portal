@@ -14,10 +14,20 @@ export class CounselorService {
     @InjectRepository(Counselor)
     private CounselorRepository: Repository<Counselor>,
   ) {}
-  async getCounselor() {
+  async getCounselor(
+    page: number,
+    limit: number,
+    sortBy: string,
+    sortOrder: 'ASC' | 'DESC',
+  ) {
     try {
+      const skip = (page - 1) * limit;
+      const order = { [sortBy]: sortOrder };
       const counselor = await this.CounselorRepository.find({
         relations: ['husband'],
+        skip,
+        take: limit,
+        order,
       });
       if (counselor?.length === 0) {
         throw new HttpException('no counselor to show', HttpStatus.NOT_FOUND);

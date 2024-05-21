@@ -15,19 +15,19 @@ import { Counselor } from './Counselor.entity';
 export class CounselorProviderEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-  @OneToOne(() => Counselee)
+  @OneToOne(() => Counselee, { onDelete: 'CASCADE' })
   @JoinColumn()
   counselee: Counselee;
-  @ManyToOne(() => Counselor, { nullable: true })
+  @ManyToOne(() => Counselor, { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn()
   preferedCounselor1: Counselor;
-  @ManyToOne(() => Counselor, { nullable: true })
+  @ManyToOne(() => Counselor, { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn()
   preferedCounselor2: Counselor;
-  @ManyToOne(() => Counselor, { nullable: true })
+  @ManyToOne(() => Counselor, { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn()
   preferedCounselor3: Counselor;
-  @Column()
+  @Column({ nullable: true })
   reasonForCounselorChange: string;
   @Column({ default: false })
   alreadySpokenToExistingCounselor: boolean;

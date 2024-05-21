@@ -9,7 +9,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Counselor } from './Counselor.entity';
-import { Child } from './Children.entity';
 
 @Entity()
 export class Counselee {
@@ -47,16 +46,16 @@ export class Counselee {
   chantingStartedThisRoundsDate: Date;
   @Column({ nullable: true })
   recommendedBy: string;
-  @ManyToOne(() => Counselor, { nullable: true })
+  @ManyToOne(() => Counselor, { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn()
   currentCounselor: Counselor;
   @Column({ nullable: true })
-  connectedToCounselorSinceYear: Date;
-  @OneToOne(() => Counselee, { nullable: true })
+  connectedToCounselorSince: Date;
+  @OneToOne(() => Counselee, { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn()
   husband: Counselee;
-  @ManyToOne(() => Child, { nullable: true })
-  children: Child[];
+  @Column({ type: 'jsonb', nullable: true })
+  children: JSON;
 
   @CreateDateColumn()
   createdAt: Date;

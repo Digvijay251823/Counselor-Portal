@@ -42,7 +42,7 @@ export class CounselorproviderService {
         where: { id: CounselorProviderSchema.counselee.toString() },
       });
       const existingEntry = await this.counselorProvider.findOne({
-        where: { counselee: counselee },
+        where: { counselee: { id: counselee.id } },
       });
       if (existingEntry) {
         throw new HttpException('already exists', HttpStatus.CONFLICT);
