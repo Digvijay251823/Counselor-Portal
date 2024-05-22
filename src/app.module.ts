@@ -26,7 +26,7 @@ import { CounselorProviderEntity } from './Entities/CounselorProvider.entity';
         host: configService.get<string>('DATABASE_HOST'),
         port: configService.get<number>('DATABASE_PORT'),
         username: configService.get<string>('DATABASE_USER'),
-        password: configService.get<string>('DATABASE_SECCODE'),
+        password: configService.get<string>('DATABASE_PASSWORD'),
         database: configService.get<string>('DATABASE'),
         entities: [join(__dirname, '**', '**', '*.entity.{ts,js}')],
         synchronize: true,
