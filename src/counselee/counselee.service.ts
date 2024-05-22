@@ -45,6 +45,18 @@ export class CounseleeService {
 
   async createCounselee(inputData: Partial<Counselee>) {
     try {
+      if (
+        !inputData.firstName ||
+        !inputData.lastName ||
+        !inputData.age ||
+        !inputData.gender ||
+        !inputData.maritalStatus
+      ) {
+        throw new HttpException(
+          'please enter all the fields carefully',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
       // Check if a counselee with the same phone number already exists
       const existingCounselee = await this.CounseleeModel.findOne({
         where: { phoneNumber: inputData.phoneNumber },
